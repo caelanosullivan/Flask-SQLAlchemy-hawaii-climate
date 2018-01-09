@@ -49,17 +49,6 @@ def welcome():
         f"/api/v1.0/<'start'>/<'end'>    Note: append dates as YYYY-MM-DD"
     )
 
-# hello_dict = {"Hello": "World!"}
-
-# @app.route("/normal")
-# def normal():
-#     return hello_dict
-
-
-# @app.route("/jsonified")
-# def jsonified():
-#     return jsonify(hello_dict)
-
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
@@ -76,10 +65,8 @@ def precipitation():
         filter(Measurement.date >= (max_date - relativedelta(years=1))).\
         group_by(Measurement.date).all()    
 
-    prcp_twelve_months_dict = dict(prcp_twelve_months)
-
     # Convert list of tuples into dictionary
-    #prcp_twelve_months_dict = dict(np.ravel(prcp_twelve_months))
+    prcp_twelve_months_dict = dict(prcp_twelve_months)
 
     return jsonify(prcp_twelve_months_dict)
 
@@ -129,6 +116,7 @@ def one_temp(start):
     results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
         filter(Measurement.date >= start).all()
 
+    #Convert list of tuples into normal list
     temps_list = list(np.ravel(results))
 
     return jsonify(temps_list)
@@ -142,6 +130,7 @@ def two_temps(start, end):
     results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
         filter(Measurement.date >= start).filter(Measurement.date <= end).all()
 
+    #Convert list of tuples into normal list
     temps_list = list(np.ravel(results))
 
     return jsonify(temps_list)
