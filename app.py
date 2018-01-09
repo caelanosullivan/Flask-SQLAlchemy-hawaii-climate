@@ -100,22 +100,25 @@ def stations():
     return jsonify(stations)
 
 
-# @app.route("/api/v1.0/tobs")
-# def tobs():
-#     """Return a json list of Temperature Observations (tobs) for the previous year"""
+@app.route("/api/v1.0/tobs")
+def tobs():
+    """Return a json list of Temperature Observations (tobs) for the previous year"""
 
-#     max_date = session.query(func.max(func.strftime("%Y/%m/%d", Measurement.date))).all()
-#     max_date = datetime.strptime(max_date[0][0], "%Y/%m/%d").date()
+    max_date = session.query(func.max(func.strftime("%Y/%m/%d", Measurement.date))).all()
+    max_date = datetime.strptime(max_date[0][0], "%Y/%m/%d").date()
 
-#     sel = [Measurement.tobs]
+    sel = [Measurement.tobs]
 
-#     results = session.query(*sel).\
-#     filter(Measurement.date >= (max_date - relativedelta(years=1))).all()
+    results = session.query(*sel).\
+    filter(Measurement.date >= (max_date - relativedelta(years=1))).all()
 
-#     #Convert list of tuples into normal list
-#     tobs_12 = list(np.ravel(results))
+    #Convert list of tuples into normal list
+    tobs_12 = list(np.ravel(results))
 
-#     return jsonify(tobs_12)  
+    # Convert datatypes to int (int64 is not json serializable)
+    tobs_12 = [int(i) for i in tobs_12]
+
+    return jsonify(tobs_12)  
 
 # @app.route("/api/v1.0/names")
 # def names():
