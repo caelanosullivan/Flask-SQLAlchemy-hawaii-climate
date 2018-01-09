@@ -45,7 +45,7 @@ def welcome():
         f"/api/v1.0/precipitation<br/>"
         f"/api/v1.0/stations<br/>"
         f"/api/v1.0/tobs<br/>"
-        f"/api/v1.0/<start><br/>"
+        f"/api/v1.0/<'start'>    Note: append start date as YYYY-MM-DD <br/>"
         f"/api/v1.0/<start>/<end>"
     )
 
@@ -120,34 +120,32 @@ def tobs():
 
     return jsonify(tobs_12)  
 
-# @app.route("/api/v1.0/names")
-# def names():
-#     """Return a list of all passenger names"""
-#     # Query all passengers
-#     results = session.query(Passenger.name).all()
+@app.route("/api/v1.0/<start>")
+def one_temp(start):
 
-#     # Convert list of tuples into normal list
-#     all_names = list(np.ravel(results))
+    """Return a json list of the minimum temperature, the average temperature, and the\
+    max temperature after a given start date."""
+    
+    results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start).all()
 
-#     return jsonify(all_names)
+    temps_list = list(np.ravel(results))
 
+    return jsonify(temps_list)
 
-# @app.route("/api/v1.0/passengers")
-# def passengers():
-#     """Return a list of passenger data including the name, age, and sex of each passenger"""
-#     # Query all passengers
-#     results = session.query(Passenger).all()
+@app.route("/api/v1.0/<start>/<end>")
+def two_temps(start, end):
 
-#     # Create a dictionary from the row data and append to a list of all_passengers
-#     all_passengers = []
-#     for passenger in results:
-#         passenger_dict = {}
-#         passenger_dict["name"] = passenger.name
-#         passenger_dict["age"] = passenger.age
-#         passenger_dict["sex"] = passenger.sex
-#         all_passengers.append(passenger_dict)
+    """Return a json list of the minimum temperature, the average temperature, and \
+    the max temperature for a given start or start-end range."""
+    
+    results = session.query(func.min(Measurement.tobs), func.avg(Measurement.tobs), func.max(Measurement.tobs)).\
+        filter(Measurement.date >= start).filter(Measurement.date <= end).all()
 
-#     return jsonify(all_passengers)
+    temps_list = list(np.ravel(results))
+
+    return jsonify(temps_list)
+
 
 
 if __name__ == '__main__':
